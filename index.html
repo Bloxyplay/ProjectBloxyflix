@@ -4148,6 +4148,7 @@ const vids=[
   {t:"[Science] How Antennas Work",tk:"[과학] 안테나의 작동원리",d:"[North Korea Science] How Antennas Work.",u:"http://upos-sz-mirrorcos.bilivideo.com/upgcxcode/76/69/36424256976/36424256976-1-192.mp4",y:"2026",c:"documentaries",ty:"Educational",views:"756",duration:"Science Lesson",isStream:true,creator:"Bloxy Play TV"},
 
   // ========== CCTV NEWS ARCHIVE ==========
+  {t:"China Central Television News Broadcast March 19, 2026 【Xinwen Lianbo】",tk:"新闻联播 2026年3月19日",d:"China Central Television News Broadcast — March 19, 2026 【Xinwen Lianbo】\n\nChapters:\n00:00 News Highlights Summary\n01:45 [New Ideas Lead the New Journey] Deliver Results for the People Through Practical Action\n08:45 Ding Xuexiang Meets UAE Presidential Envoy for China Affairs\n09:42 [Unite Hearts, Work Hard, Strive for a Strong Start to the 15th Five-Year Plan] Shanghai Accelerates Building a Higher-Level Open Economy\n12:05 China's Industrial Economy Achieves Strong Start in First Two Months\n13:46 [On the Fields of Hope] Racing Against the Season — Spring Plowing and Crop Management Underway Across the Country\n15:50 'Spring Economy' Booming — Cultural Tourism Consumption Continues to Surge\n17:43 [News Feature] A Different Kind of Urban Renewal\n20:07 Domestic News Roundup:\n(1) Guidelines on Accelerating Green Transition of Small Hydropower Stations Issued\n(2) China Issues 198 Million Green Certificates in February 2026\n(3) Xiong'an New Area Forest Coverage Rate Rises to 35.1%\n(4) 'Spring Employment Drive' Launched for 2026 University Graduates\n(5) General Administration of Customs Revises Regulations on Registration of Overseas Food Manufacturers\n(6) Xinjiang Oilfield Tianshan Gas Field Surpasses 1 Billion Cubic Meters of Natural Gas Output\n(7) China's Total Covered Bridge Heritage Sites Reaches 2,193\n(8) CMG 'Spring in China' Global Dialogue Forum Held Across Multiple Countries\n22:56 Israel Says It Struck Iranian Energy Facilities in Coordination With U.S. — Iran Vows Retaliation Against U.S.-Linked Energy Infrastructure:\n(1) Several European Nations Say They Will Not Join U.S.-Israel Military Action Against Iran\n(2) U.S. Director of National Intelligence Says Iran Has Not Attempted to Rebuild Uranium Enrichment Capability\n25:50 U.S. Federal Debt Surpasses $39 Trillion — U.S. Media Says War Is One Reason for Debt Surge\n26:51 Russia Warns Japan to Learn From History and Not Repeat Past Mistakes\n27:29 International News Roundup:\n(1) Lebanon Says Israeli Airstrikes Have Killed 968 People\n(2) Russia Says Russia-U.S.-Ukraine Security Working Group Has Suspended Operations\n(3) U.S. Federal Reserve Announces Federal Funds Rate Held Unchanged\n(4) U.S. Freight Train Derails, Causing Partial Chemical Spill",u:"Ri3A7TzNL84",y:"2026",c:"cctv",ty:"CCTV News",views:"0",duration:"News Broadcast",isYouTube:true,creator:"CCTV",badge:"new"},
   {t:"China Central Television News Broadcast March 18, 2026",tk:"新闻联播 2026年3月18日",d:"China Central Television News Broadcast March 18, 2026.",u:"utPfaklmodE",y:"2026",c:"cctv",ty:"CCTV News",views:"0",duration:"News Broadcast",isYouTube:true,creator:"CCTV",badge:"new"},
   {t:"China Central Television News Broadcast March 17, 2026 【Xinwen Lianbo】",tk:"新闻联播 2026年3月17日",d:"China Central Television News Broadcast March 17, 2026.\n\nStream link expired — CCTV CDN links are time-limited. A fresh link will be added soon. For now, watch the full broadcast at tv.cctv.com",u:"",y:"2026",c:"cctv",ty:"CCTV News",views:"2.1K",duration:"News Broadcast",creator:"CCTV",badge:"soon",comingSoon:true}
 ];
@@ -4980,10 +4981,11 @@ const EPG_CAT_COLORS = {
 let epgTimer = null;
 
 function getPyongyangTime(){
-  // Pyongyang Standard Time = UTC+9 (same as JST/KST)
+  // Force Pyongyang Standard Time (UTC+9) regardless of the viewer's device timezone.
+  // toLocaleString with timeZone creates a string in PYT, then we parse it back into
+  // a Date so that .getHours() / .getMinutes() / .getSeconds() all return PYT values.
   const now = new Date();
-  const utc = now.getTime() + now.getTimezoneOffset() * 60000;
-  return new Date(utc + 9 * 3600000);
+  return new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Pyongyang' }));
 }
 
 function timeToMinutes(timeStr){
@@ -5908,35 +5910,31 @@ function updateKCTVOverlay(){
   const onAirClock = document.getElementById('kctvOnAirClock');
   if(!overlay) return;
 
-  // Use device local time — Myanmar users will be UTC+6:30, others see their own tz
-  const now  = new Date();
-  const h    = now.getHours();
-  const m    = now.getMinutes();
-  const s    = now.getSeconds();
+  // Always use Pyongyang Standard Time (UTC+9) regardless of viewer's timezone.
+  // This is the only correct reference — KCTV schedules are Pyongyang-based.
+  const pyt  = getPyongyangTime();
+  const h    = pyt.getHours();
+  const m    = pyt.getMinutes();
+  const s    = pyt.getSeconds();
   const mins = h * 60 + m;
 
-  // On-air window: 06:00 (360 min) → 21:00 (1260 min) device local time
-  // At 5:59:59 the overlay is still showing; at 6:00:00 it disappears automatically
-  // At 21:00:00 the overlay reappears for off-air archiving
-  const ON_AIR_START = 6 * 60;   // 06:00
-  const ON_AIR_END   = 21 * 60;  // 21:00
+  // KCTV on-air window: 06:00–21:00 Pyongyang time
+  const ON_AIR_START = 6  * 60;  // 06:00 PYT
+  const ON_AIR_END   = 21 * 60;  // 21:00 PYT
   const onAir = mins >= ON_AIR_START && mins < ON_AIR_END;
 
   const hh = String(h).padStart(2,'0');
   const mm = String(m).padStart(2,'0');
   const ss = String(s).padStart(2,'0');
-  const timeStr = hh+':'+mm+':'+ss;
+  const timeStr = hh+':'+mm+':'+ss+' PYT';
 
   if(onAir){
     overlay.style.display = 'none';
     if(onAirClock){
       onAirClock.style.display = 'flex';
       document.getElementById('kctvClockTime').textContent = timeStr;
-      // Show current PST programme name alongside local time
-      const pst = getPyongyangTime();
-      const pstMins = pst.getHours()*60 + pst.getMinutes();
-      const schedule = getScheduleForDay(pst.getDay());
-      const slotIdx  = getCurrentEpgSlot(schedule, pstMins);
+      const schedule = getScheduleForDay(pyt.getDay());
+      const slotIdx  = getCurrentEpgSlot(schedule, mins);
       const prog = document.getElementById('kctvClockProg');
       if(prog) prog.textContent = '▶ '+(schedule[slotIdx]?.en || 'On Air');
     }
@@ -5951,24 +5949,18 @@ function renderKCTVTimeline(timeStr, nowMins){
   const nextEl   = document.getElementById('kctvNextOnAir');
   const offClock = document.getElementById('kctvOffAirTime');
 
-  // Show device local time clock
+  // Clock shows Pyongyang time so viewers always know the local broadcast time
   if(offClock) offClock.textContent = timeStr;
 
-  // Next on-air countdown
+  // Countdown to next on-air in Pyongyang time
   if(nextEl){
-    const ON_AIR_START = 6 * 60; // 06:00 local
-    if(nowMins < ON_AIR_START){
-      const diff = ON_AIR_START - nowMins;
-      const hLeft = Math.floor(diff / 60);
-      const mLeft = diff % 60;
-      nextEl.textContent = `On-air in ${hLeft}h ${mLeft}m`;
-    } else {
-      // After 21:00, next on-air is tomorrow at 06:00
-      const diff = (24 * 60 - nowMins) + ON_AIR_START;
-      const hLeft = Math.floor(diff / 60);
-      const mLeft = diff % 60;
-      nextEl.textContent = `On-air in ${hLeft}h ${mLeft}m`;
-    }
+    const ON_AIR_START = 6 * 60; // 06:00 PYT
+    const diff = nowMins < ON_AIR_START
+      ? ON_AIR_START - nowMins                      // still before 06:00 today
+      : (24 * 60 - nowMins) + ON_AIR_START;         // past 21:00, next is tomorrow 06:00
+    const hLeft = Math.floor(diff / 60);
+    const mLeft = diff % 60;
+    nextEl.textContent = `On-air in ${hLeft}h ${mLeft}m (Pyongyang time)`;
   }
 }
 </script>
