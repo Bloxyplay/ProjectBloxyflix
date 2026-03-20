@@ -624,10 +624,54 @@ body{
 .loading-logo{font-size:2.5rem;font-weight:900;color:#fff;letter-spacing:-1px;margin-bottom:1rem;}
 .loading-logo span{color:var(--accent);}
 .loading-text{color:var(--text-secondary);font-size:.9rem;margin-bottom:1.5rem;}
-.loading-spinner{width:36px;height:36px;border:3px solid rgba(255,255,255,0.1);border-top-color:var(--accent);border-radius:50%;animation:lspin .8s linear infinite;}
+.loading-progress-track{
+  width:160px;height:2px;
+  background:rgba(255,255,255,0.1);
+  border-radius:99px;
+  margin-top:1.25rem;
+  overflow:hidden;
+}
+.loading-progress-fill{
+  height:100%;width:0%;
+  background:var(--accent);
+  border-radius:99px;
+  animation:loadingProgress 1.4s cubic-bezier(0.4,0,0.2,1) forwards;
+}
+@keyframes loadingProgress{
+  0%{width:0%;}
+  40%{width:55%;}
+  70%{width:78%;}
+  90%{width:92%;}
+  100%{width:100%;}
+}
+  width:48px;height:48px;
+  border-radius:50%;
+  background:conic-gradient(var(--accent) 0%, transparent 60%);
+  animation:lspin .9s linear infinite;
+  position:relative;
+}
+.loading-spinner::after{
+  content:'';position:absolute;inset:4px;
+  border-radius:50%;background:var(--bg-primary);
+}
 @keyframes lspin{to{transform:rotate(360deg);}}
+.loading-logo{animation:logoEntrance .7s cubic-bezier(0.34,1.56,0.64,1) both;}
+@keyframes logoEntrance{
+  from{opacity:0;transform:scale(0.5) translateY(16px);}
+  to{opacity:1;transform:scale(1) translateY(0);}
+}
+.loading-text{animation:fadeSlideUp .5s ease both .25s;}
+@keyframes fadeSlideUp{
+  from{opacity:0;transform:translateY(10px);}
+  to{opacity:1;transform:translateY(0);}
+}
 
-@keyframes subscribePulse{0%,100%{box-shadow:0 0 0 0 rgba(255,0,0,0.5);}50%{box-shadow:0 0 0 6px rgba(255,0,0,0);}}
+@keyframes subscribePulse{
+  0%{box-shadow:0 0 0 0 rgba(255,0,0,0.6);}
+  40%{box-shadow:0 0 0 8px rgba(255,0,0,0.1);}
+  70%{box-shadow:0 0 0 14px rgba(255,0,0,0);}
+  100%{box-shadow:0 0 0 0 rgba(255,0,0,0);}
+}
 
 /* ── SUBSCRIBE PAGE ─────────────────────────────────────── */
 #page-subscribe{padding:0;}
@@ -750,8 +794,9 @@ body{
   animation:livePulse 1.4s ease-in-out infinite;
 }
 @keyframes livePulse{
-  0%{box-shadow:0 0 0 0 rgba(255,0,0,0.7);}
-  60%{box-shadow:0 0 0 8px rgba(255,0,0,0);}
+  0%{box-shadow:0 0 0 0 rgba(255,0,0,0.8);}
+  40%{box-shadow:0 0 0 6px rgba(255,0,0,0.2);}
+  70%{box-shadow:0 0 0 12px rgba(255,0,0,0);}
   100%{box-shadow:0 0 0 0 rgba(255,0,0,0);}
 }
 @keyframes pulse-live{
@@ -773,9 +818,14 @@ body{
   border-radius:18px;
   padding:1.1rem 1.2rem;
   cursor:pointer;
-  transition:all .22s cubic-bezier(.4,0,.2,1);
+  transition:all .3s cubic-bezier(0.34,1.06,0.64,1);
   text-decoration:none;color:inherit;display:block;
+  animation:cardAppear .5s ease both;
 }
+.signal-card:nth-child(1){animation-delay:.05s;}
+.signal-card:nth-child(2){animation-delay:.15s;}
+.signal-card:nth-child(3){animation-delay:.25s;}
+.signal-card:nth-child(4){animation-delay:.35s;}
 .signal-card::before{
   content:'';position:absolute;inset:0;
   background:linear-gradient(120deg,rgba(255,0,0,0.08) 0%,transparent 60%);
@@ -839,7 +889,11 @@ body{
   gap:.5rem;
   animation:slideDown .5s ease-out;
 }
-@keyframes slideDown{from{transform:translateY(-100%);}to{transform:translateY(0);}}
+@keyframes slideDown{
+  from{transform:translateY(-110%);opacity:0;}
+  60%{transform:translateY(4px);opacity:1;}
+  to{transform:translateY(0);opacity:1;}
+}
 .notice-icon{width:20px;height:20px;}
 .notice-text{font-size:.9rem;font-weight:500;text-align:center;}
 .notice-close{
@@ -933,11 +987,14 @@ body{
   width:100%;
   z-index:1000;
   background:linear-gradient(to bottom,rgba(20,20,20,0.95) 0%,transparent 100%);
-  transition:background 0.4s ease;
+  transition:background 0.5s ease, backdrop-filter 0.5s ease;
   padding:0.5rem 0;
 }
 .nav.scrolled{
   background:var(--bg-primary);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  box-shadow:0 2px 20px rgba(0,0,0,0.4);
 }
 .nav-wrap{
   display:flex;
@@ -1044,7 +1101,7 @@ body{
   -webkit-backdrop-filter:blur(20px);
   z-index:1001;
   transform:translateX(-100%);
-  transition:transform .3s cubic-bezier(0.4,0,0.2,1);
+  transition:transform .35s cubic-bezier(0.34,1.04,0.64,1);
   overflow-y:auto;
   border-right:1px solid var(--glass-border);
 }
@@ -1084,8 +1141,8 @@ body{
   z-index:1001;
   border:1px solid var(--glass-border);
 }
-.profile-menu.active{display:block;animation:fadeIn .2s ease-out;}
-@keyframes fadeIn{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
+.profile-menu.active{display:block;animation:menuSlideIn .22s cubic-bezier(0.22,1,0.36,1);}
+@keyframes menuSlideIn{from{opacity:0;transform:translateY(-12px) scale(0.96);}to{opacity:1;transform:translateY(0) scale(1);}}
 .profile-header{display:flex;align-items:center;gap:1rem;padding:1rem;border-bottom:1px solid var(--glass-border);margin-bottom:.5rem;}
 .profile-avatar{width:40px;height:40px;background:var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;}
 .profile-name{font-weight:500;font-size:.9rem;cursor:text;border-bottom:1px dashed transparent;transition:border-color .2s;outline:none;}
@@ -1114,6 +1171,18 @@ body{
   display:flex;
   align-items:flex-end;
   overflow:hidden;
+  animation:heroBannerIn 1.2s ease both;
+}
+@keyframes heroBannerIn{
+  from{opacity:0;}
+  to{opacity:1;}
+}
+.hero-banner::after{
+  animation:auroraShift 8s ease-in-out infinite alternate;
+}
+@keyframes auroraShift{
+  0%{opacity:0.35;transform:translateX(-3%);}
+  100%{opacity:0.55;transform:translateX(3%);}
 }
 .hero-banner::before{
   content:'';
@@ -1140,7 +1209,16 @@ body{
   padding:0 4% 8%;
   width:100%;
   max-width:800px;
+  animation:heroContentIn .9s cubic-bezier(0.22,1,0.36,1) both .3s;
 }
+@keyframes heroContentIn{
+  from{opacity:0;transform:translateY(30px);}
+  to{opacity:1;transform:translateY(0);}
+}
+.hero-logo{animation:heroContentIn .7s cubic-bezier(0.22,1,0.36,1) both .2s;}
+.hero-title{animation:heroContentIn .8s cubic-bezier(0.22,1,0.36,1) both .35s;}
+.hero-subtitle{animation:heroContentIn .8s cubic-bezier(0.22,1,0.36,1) both .5s;}
+.hero-buttons{animation:heroContentIn .8s cubic-bezier(0.22,1,0.36,1) both .65s;}
 .hero-logo{
   width:60px;
   height:60px;
@@ -1204,7 +1282,7 @@ body{
   font-size:1.1rem;
   font-weight:600;
   cursor:pointer;
-  transition:all 0.2s ease;
+  transition:all 0.25s cubic-bezier(0.34,1.2,0.64,1);
   border:none;
 }
 .hero-btn-primary{
@@ -1212,7 +1290,9 @@ body{
   color:#000;
 }
 .hero-btn-primary:hover{
-  background:rgba(255,255,255,0.75);
+  background:rgba(255,255,255,0.85);
+  transform:scale(1.04);
+  box-shadow:0 8px 24px rgba(0,0,0,0.35);
 }
 .hero-btn-secondary{
   background:rgba(109,109,110,0.7);
@@ -1220,9 +1300,11 @@ body{
   backdrop-filter:blur(4px);
 }
 .hero-btn-secondary:hover{
-  background:rgba(109,109,110,0.4);
+  background:rgba(109,109,110,0.5);
+  transform:scale(1.04);
 }
-.hero-btn svg{width:24px;height:24px;}
+.hero-btn svg{width:24px;height:24px;transition:transform .22s ease;}
+.hero-btn:hover svg{transform:scale(1.15);}
 @media(max-width:768px){
   .hero-banner{height:60vh;min-height:400px;}
   .hero-title{font-size:2.5rem;}
@@ -1355,12 +1437,14 @@ body{
   grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
   gap:0.25rem;
   padding:1rem 4% 3rem;
+  overflow:visible;
 }
 @media(max-width:768px){
   .video-grid{
     grid-template-columns:repeat(2,1fr);
     gap:0.5rem;
     padding:1rem 1rem 2rem;
+    overflow:hidden;
   }
 }
 @media(max-width:480px){
@@ -1372,14 +1456,43 @@ body{
 /* Video Card - Netflix Style */
 .video-card{
   cursor:pointer;
-  transition:all 0.4s cubic-bezier(0.25,0.46,0.45,0.94);
+  transition:transform 0.38s cubic-bezier(0.25,0.46,0.45,0.94), box-shadow 0.38s ease;
   position:relative;
   border-radius:4px;
   overflow:hidden;
+  will-change:transform;
+  animation:cardAppear 0.45s ease both;
 }
-.video-card:hover{
-  transform:scale(1.4);
-  z-index:100;
+@keyframes cardAppear{
+  from{opacity:0;transform:translateY(12px) scale(0.97);}
+  to{opacity:1;transform:translateY(0) scale(1);}
+}
+.video-card:nth-child(1){animation-delay:.04s;}
+.video-card:nth-child(2){animation-delay:.08s;}
+.video-card:nth-child(3){animation-delay:.12s;}
+.video-card:nth-child(4){animation-delay:.16s;}
+.video-card:nth-child(5){animation-delay:.20s;}
+.video-card:nth-child(6){animation-delay:.24s;}
+.video-card:nth-child(7){animation-delay:.28s;}
+.video-card:nth-child(8){animation-delay:.32s;}
+.video-card:nth-child(9){animation-delay:.36s;}
+.video-card:nth-child(10){animation-delay:.40s;}
+.video-card:nth-child(n+11){animation-delay:.44s;}
+/* Hover scale — desktop only, avoids clipping on mobile grid */
+@media(hover:hover) and (pointer:fine){
+  .video-card{overflow:visible;}
+  .video-card:hover{
+    transform:scale(1.42) translateY(-4px);
+    z-index:100;
+    box-shadow:0 20px 60px rgba(0,0,0,0.7),0 0 0 1px rgba(255,255,255,0.08),0 8px 30px rgba(229,9,20,0.2);
+  }
+}
+/* Mobile tap feedback — subtle brightness lift instead of scale */
+@media(hover:none){
+  .video-card:active{
+    filter:brightness(1.15);
+    transform:scale(0.98);
+  }
 }
 .video-card:hover .card-actions{opacity:1;}
 .video-card:hover .card-info-overlay{
@@ -1393,7 +1506,8 @@ body{
   background:var(--bg-card);
   border-radius:4px;
   overflow:hidden;
-  transition:all 0.3s ease;
+  transition:all 0.38s ease;
+  box-shadow:0 2px 8px rgba(0,0,0,0.4);
 }
 .card-thumb img{
   width:100%;
@@ -1437,7 +1551,14 @@ body{
   text-transform:uppercase;
   letter-spacing:0.5px;
 }
-.card-badge.new{background:var(--success);}
+.card-badge.new{
+  background:var(--success);
+  animation:badgeShimmer 2.5s ease-in-out infinite;
+}
+@keyframes badgeShimmer{
+  0%,100%{box-shadow:0 0 0 0 rgba(70,211,105,0);}
+  50%{box-shadow:0 0 8px 2px rgba(70,211,105,0.55);}
+}
 .card-badge.trending{background:var(--warning);}
 .card-badge.live{background:#e50914;}
 .card-badge.youtube{background:#ff0000;}
@@ -2236,6 +2357,7 @@ html,body{background:#0a0a0a!important;margin:0;padding:0;}
   <div class="loading-logo">BLOXY<span>FLIX</span></div>
   <div class="loading-text">Loading archive...</div>
   <div class="loading-spinner"></div>
+  <div class="loading-progress-track"><div class="loading-progress-fill" id="loadingProgressFill"></div></div>
 </div>
 
 <!-- Notice Banner -->
@@ -3283,7 +3405,7 @@ html,body{background:#0a0a0a!important;margin:0;padding:0;}
         <h2>Get in Touch</h2>
         <p>We welcome feedback, content suggestions, and partnership inquiries:</p>
         <div class="contact-section">
-          <p><strong>Email:</strong> <a href="mailto:contact@bloxyplay.com">contact@bloxyplay.com</a></p>
+          <p><strong>Email:</strong> <a href="/cdn-cgi/l/email-protection#274448495346445367454b485f5e574b465e0944484a"><span class="__cf_email__" data-cfemail="eb8884859f8a889fab89878493929b878a92c5888486">[email&#160;protected]</span></a></p>
           <p><strong>Company:</strong> Bloxy Play Technology &amp; Blocky Studio Company Limited</p>
         </div>
       </div>
@@ -3400,7 +3522,7 @@ html,body{background:#0a0a0a!important;margin:0;padding:0;}
         <div class="contact-section">
           <h3>Contact Us</h3>
           <p>If you have any questions, concerns, or requests regarding this Privacy Policy or our data practices, please contact us:</p>
-          <p><strong>Email:</strong> <a href="mailto:privacy@bloxyplay.com">privacy@bloxyplay.com</a></p>
+          <p><strong>Email:</strong> <a href="/cdn-cgi/l/email-protection#3242405b4453514b72505e5d4a4b425e534b1c515d5f"><span class="__cf_email__" data-cfemail="4a3a38233c2b29330a28262532333a262b3364292527">[email&#160;protected]</span></a></p>
           <p><strong>Company:</strong> Bloxy Play Technology &amp; Blocky Studio Company Limited</p>
         </div>
       </div>
@@ -3516,7 +3638,7 @@ html,body{background:#0a0a0a!important;margin:0;padding:0;}
         <div class="contact-section">
           <h3>Contact Us</h3>
           <p>For any questions, concerns, or legal notices regarding these Terms of Service, please contact us at:</p>
-          <p><strong>Email:</strong> <a href="mailto:legal@bloxyplay.com">legal@bloxyplay.com</a></p>
+          <p><strong>Email:</strong> <a href="/cdn-cgi/l/email-protection#305c5557515c70525c5f4849405c51491e535f5d"><span class="__cf_email__" data-cfemail="513d3436303d11333d3e2928213d30287f323e3c">[email&#160;protected]</span></a></p>
           <p><strong>Company:</strong> Bloxy Play Technology &amp; Blocky Studio Company Limited</p>
         </div>
       </div>
@@ -3934,7 +4056,7 @@ html,body{background:#0a0a0a!important;margin:0;padding:0;}
   <div class="footer-disclaimer">This is a Forever Free educational streaming service. No hidden fees, no paid plans - completely free forever. All content is sourced from publicly available archives.</div>
 </footer>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 <script src="https://cdn.jsdelivr.net/npm/video.js@8.10.0/dist/video.min.js"></script>
 <script>
 
@@ -4009,6 +4131,15 @@ const vids=[
   {t:"Engineering Regiment Return Celebration Performance",tk:"공병련대 전투원들의 귀국을 축하하는 공연",d:"Source: KCTV 2025-12-14 10:07:00 via intchoson.com\n\nPerformance Given in the Presence of the Respected Comrade Kim Jong Un to Celebrate the Return of Combatants of the Engineering Regiment Who Death-defyingly Implemented the Party's Combat Orders in Overseas Operation Areas.",u:"0G7wOidu0T4",y:"2025",c:"youtube",ty:"YouTube Archive",views:"7.2K",duration:"Full Performance",isYouTube:true,creator:"Intchoson - N.S.",hasChapters:true},
   {t:"March 8 International Women's Day Performance 2026",tk:"3.8국제부녀절기념공연 2026",d:"Source: KCTV 2026-03-10 20:29 via intchoson.com\n\nA performance was given with splendor to commemorate the March 8 International Women's Day. (Compressed Version)",u:"pizZOG-0R04",y:"2026",c:"youtube",ty:"YouTube Archive",views:"3.9K",duration:"Full Performance",isYouTube:true,creator:"Intchoson - N.S.",hasChapters:true},
   
+  // NEW MOVIES - Added March 2026
+  {t:"Hometown",tk:"고향땅",d:"Hometown / 고향땅",u:"https://vod.koryo.tv/media/original/user/admin/2d274629b8b44147bf2fcd94118e8ee9.Hometown.mkv",y:"2026",c:"movies",ty:"Movie",views:"0",duration:"Feature Film",badge:"new"},
+  {t:"Traces of Life Part 1",tk:"생의 흔적 - 전편",d:"Traces of Life Part 1 / 생의 흔적 - 전편",u:"https://vod.koryo.tv/media/original/user/admin/a5bf5734b81948b0b9007b24e4e7d5c4.TracesofLifePart1.mkv",y:"2026",c:"movies",ty:"Movie",views:"0",duration:"Feature Film",badge:"new"},
+  {t:"Traces of Life Part 2",tk:"생의 흔적 - 후편",d:"Traces of Life Part 2 / 생의 흔적 - 후편",u:"https://vod.koryo.tv/media/original/user/admin/a21edb26aec24ca2b8656158cb86219f.TracesofLifePart2.mkv",y:"2026",c:"movies",ty:"Movie",views:"0",duration:"Feature Film",badge:"new"},
+  {t:"Heart of Youth",tk:"청춘의 심장",d:"Heart of Youth / 청춘의 심장",u:"https://vod.koryo.tv/media/original/user/admin/4767c12ea804433384140083cfed410b.HeartofYouth.mkv",y:"2026",c:"movies",ty:"Movie",views:"0",duration:"Feature Film",badge:"new"},
+
+  // NEW YOUTUBE VIDEOS - Added March 2026
+  {t:"Kim Jong Un Observed Joint Attack Tactical Drill of Infantry and Tank Subunits",tk:"경애하는 김정은동지께서 보병,땅크병구분대들의 협동공격전술연습을 참관하시였다",d:"경애하는 김정은동지께서 보병,땅크병구분대들의 협동공격전술연습을 참관하시였다\n\nThis video covers the joint attack tactical training of infantry and tank units attended by Kim Jong Un on March 19, 2024, at the Pyongyang 60th Training Ground (0:30-0:42).\n\nKey Highlights:\n- Training Objectives: The exercise aimed to improve coordination between infantry and tanks in striking enemy defense lines and expanding attack gains (1:46-2:02).\n- Technical Demonstration: The training featured the use of drones for real-time reconnaissance and striking enemy command posts (2:24-2:33).\n- New Main Battle Tank: A significant portion of the video showcases the superior performance of a new main battle tank, which Kim Jong Un praised for its mobility, striking power, and active protection systems (8:07-8:36).\n- Active Protection System Test: The new tank successfully intercepted incoming anti-tank missiles and drones with 100% accuracy during testing (8:46-8:54).\n- Strategic Vision: Kim Jong Un emphasized the importance of modernized, realistic training to ensure military readiness and stated that the new tanks will be deployed to the army (9:07-11:19).",u:"-yvwKI0awlc",y:"2024",c:"news",ty:"News Report",views:"0",duration:"News Report",isYouTube:true,creator:"KCNA",badge:"new"},
+
   // NEW STREAMING MP4 VIDEOS - Added March 2026
   {t:"[Science] Differences between Baking Soda and Soda Ash",tk:"[과학] 베이킹소다와 소다재의 차이",d:"[North Korean Science Popularization] Differences between baking soda (NaHCO₃) and soda ash (Na₂CO₃)",u:"http://upos-sz-mirrorcos.bilivideo.com/upgcxcode/44/48/36424384844/36424384844-1-192.mp4",y:"2026",c:"documentaries",ty:"Educational",views:"892",duration:"Science Lesson",isStream:true,creator:"Bloxy Play TV"},
   {t:"[Education] High School Mathematics: Probability",tk:"[교육] 고등학교 수학: 확률의 의미와 성질",d:"[North Korean Open Course] High School Mathematics: The Meaning and Properties of Probability",u:"http://upos-sz-mirrorcos.bilivideo.com/upgcxcode/89/76/36424387689/36424387689-1-192.mp4",y:"2026",c:"documentaries",ty:"Educational",views:"1.1K",duration:"Math Lesson",isStream:true,creator:"Bloxy Play TV"},
@@ -5892,18 +6023,4 @@ function showSourceModal(){
 function copySourceLink(){
   const btn=document.getElementById('srcCopyBtn');
   if(navigator.clipboard){
-    navigator.clipboard.writeText('https://bloxyflix-kctv.netlify.app/').then(()=>{
-      btn.textContent='Copied!';btn.style.background='#4caf50';
-      setTimeout(()=>{btn.textContent='Copy';btn.style.background='var(--accent,#ff0000)';},2000);
-    });
-  } else {
-    btn.textContent='Copied!';btn.style.background='#4caf50';
-    setTimeout(()=>{btn.textContent='Copy';btn.style.background='var(--accent,#ff0000)';},2000);
-  }
-}
-document.getElementById('sourceModal').addEventListener('click',function(e){
-  if(e.target===this)this.style.display='none';
-});
-</script>
-</body>
-</html>
+    navigator.clipboard.writeText('https://bloxyflix-kctv.netlif
